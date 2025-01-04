@@ -1,15 +1,30 @@
-# deploy.ps1
-# Set variables for deployment
-$resourceGroup = "ThAmCowebapps_group"         
-$profileServiceName = "ThAmCoProfileService"       
-$productServiceName = "ThAmcoProduct-Service"       
+# Define variables
+$resourceGroup = "ThAmCowebapps_group"
+$profileServiceName = "ThAmCoProfileService"
+$productServiceName = "ThAmcoProduct-Service"
 
-# Deploy ProfileService
-Write-Host "Deploying ProfileService..."
-az webapp deploy --name $profileServiceName --resource-group $resourceGroup --src-path ./ProfileService
+# Ensure Azure CLI is logged in
+Write-Host "Logging in to Azure..."
+az login
 
-# Deploy ProductService
-Write-Host "Deploying ProductService..."
-az webapp deploy --name $productServiceName --resource-group $resourceGroup --src-path ./ProductService
+# Create Resource Group (if it doesn't exist)
+Write-Host "Creating Resource Group if it doesn't already exist..."
+az group create --name $resourceGroup --location "UKSouth"
 
-Write-Host "Deployment Complete!"
+# Profile Service Deployment
+Write-Host "Deploying Profile Service..."
+az webapp up --name $profileServiceName `
+             --resource-group $resourceGroup `
+             --runtime "DOTNETCORE|9.0" `
+             --location "UKSouth" `
+             --src-path "./ProfileService"
+Write-Host "Profile Service deployed successfully."
+
+# Product Service Deployment
+Write-Host "Deploying Product Service..."
+az webapp up --name $productServiceName `
+             --resource-group $resourceGroup `
+             --runtime "DOTNETCORE|9.0" `
+             --location "UKSouth" `
+             --src-path "./ProductService"
+Write-Host "Product Service deployed successfully."
