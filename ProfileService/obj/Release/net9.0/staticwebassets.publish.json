@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "qGQU6z7fTK8ztgwDASzjrcnp6XL3hjIbA/KxcmjobN0=",
+  "Source": "ProfileService",
+  "BasePath": "_content/ProfileService",
+  "Mode": "Default",
+  "ManifestType": "Publish",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
