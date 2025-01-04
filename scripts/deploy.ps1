@@ -10,11 +10,12 @@ az group create --name $resourceGroup --location $location
 
 # Deploy Profile Service
 Write-Host "Deploying Profile Service..."
-az webapp up --name $profileServiceName --resource-group $resourceGroup --runtime "DOTNETCORE|9.0" --location $location
+cd ../ProfileService
+az webapp up --name $profileServiceName --resource-group $resourceGroup --runtime "dotnet:9" --location $location
 Write-Host "Profile Service deployed successfully."
 
 # Deploy Product Service
 Write-Host "Deploying Product Service..."
 cd ../ProductService
-az webapp up --name $productServiceName --resource-group $resourceGroup --runtime "DOTNETCORE|9.0" --location $location
+az webapp up --name $productServiceName --resource-group $resourceGroup --runtime "dotnet:9" --location $location
 Write-Host "Product Service deployed successfully."
