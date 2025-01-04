@@ -1,8 +1,8 @@
 # deploy.ps1
 # Set variables for deployment
-$resourceGroup = "YourResourceGroup"         # Replace with your Azure resource group name
-$profileServiceName = "ProfileService"       # Replace with your ProfileService Web App name
-$productServiceName = "ProductService"       # Replace with your ProductService Web App name
+$resourceGroup = "ThAmCowebapps_group"         
+$profileServiceName = "ThAmCoProfileService"       
+$productServiceName = "ThAmcoProduct-Service"       
 
 # Deploy ProfileService
 Write-Host "Deploying ProfileService..."
