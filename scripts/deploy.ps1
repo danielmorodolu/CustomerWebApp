@@ -1,30 +1,20 @@
 # Define variables
 $resourceGroup = "ThAmCowebapps_group"
+$location = "UKSouth"
 $profileServiceName = "ThAmCoProfileService"
 $productServiceName = "ThAmcoProduct-Service"
 
-# Ensure Azure CLI is logged in
-Write-Host "Logging in to Azure..."
-az login
-
-# Create Resource Group (if it doesn't exist)
+# Create the resource group if it doesn't exist
 Write-Host "Creating Resource Group if it doesn't already exist..."
-az group create --name $resourceGroup --location "UKSouth"
+az group create --name $resourceGroup --location $location
 
-# Profile Service Deployment
+# Deploy Profile Service
 Write-Host "Deploying Profile Service..."
-az webapp up --name $profileServiceName `
-             --resource-group $resourceGroup `
-             --runtime "DOTNETCORE|9.0" `
-             --location "UKSouth" `
-             --src-path "./ProfileService"
+az webapp up --name $profileServiceName --resource-group $resourceGroup --runtime "DOTNETCORE|9.0" --location $location
 Write-Host "Profile Service deployed successfully."
 
-# Product Service Deployment
+# Deploy Product Service
 Write-Host "Deploying Product Service..."
-az webapp up --name $productServiceName `
-             --resource-group $resourceGroup `
-             --runtime "DOTNETCORE|9.0" `
-             --location "UKSouth" `
-             --src-path "./ProductService"
+cd ../ProductService
+az webapp up --name $productServiceName --resource-group $resourceGroup --runtime "DOTNETCORE|9.0" --location $location
 Write-Host "Product Service deployed successfully."
