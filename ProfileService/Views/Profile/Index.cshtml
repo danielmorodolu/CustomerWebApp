@@ -1,0 +1,30 @@
+﻿@model IEnumerable<ProfileService.Models.Profile>
+
+<h1>Profile List</h1>
+<a href="@Url.Action("Create", "Profile")">Add New Profile</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Address</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var profile in Model)
+        {
+            <tr>
+                <td>@profile.Name</td>
+                <td>@profile.Email</td>
+                <td>@profile.Address</td>
+                <td>
+                    <a href="@Url.Action("Details", "Profile", new { id = profile.Id })">Details</a> |
+                    <a href="@Url.Action("Edit", "Profile", new { id = profile.Id })">Edit</a> |
+                    <a href="@Url.Action("Delete", "Profile", new { id = profile.Id })">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

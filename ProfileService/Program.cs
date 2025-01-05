@@ -1,57 +1,60 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Auth0.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using SampleMvcApp.Support;
+using System.Net;
 using ProfileService.Models;
-using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
+
+
+
+using Microsoft.IdentityModel.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
-builder.Services.AddControllers(); // Add controllers for API
+builder.Services.AddControllers();
+builder.Services.AddRazorPages(); // Ensure Razor Pages services are added
+
+//To use MVC we have to explicitly declare we are using it. Doing so will prevent a System.InvalidOperationException.
+builder.Services.AddControllersWithViews();
+builder.Services.AddAuth0WebAppAuthentication(options =>
+{
+    options.Domain = builder.Configuration["Auth0:Domain"];
+    options.ClientId = builder.Configuration["Auth0:ClientId"];
+});
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))); // Add DbContext with SQL Server
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); // Add Swagger for OpenAPI documentation
 
+// Configure the HTTP request pipeline.
+builder.Services.ConfigureSameSiteNoneCookies();
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(); // Enable Swagger UI only in development
+    app.UseExceptionHandler("/Home/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
 }
 
-app.UseHttpsRedirection(); // Force HTTPS for secure communication
+IdentityModelEventSource.ShowPII = true;
 
-app.UseAuthorization(); // Add Authorization middleware
 
-app.MapControllers(); // Map controllers to endpoints
+app.UseStaticFiles();
+app.UseCookiePolicy();
 
-// Optional: Example endpoint for testing
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.MapRazorPages();
 
 app.Run();
-
-// Record type for the weather endpoint
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

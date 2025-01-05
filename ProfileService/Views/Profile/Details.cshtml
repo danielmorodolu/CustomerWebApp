@@ -1,0 +1,18 @@
+@model ProfileService.Models.Profile
+
+<h1>Profile Details</h1>
+
+<div>
+    <label>Name:</label>
+    <span>@Model.Name</span>
+</div>
+<div>
+    <label>Email:</label>
+    <span>@Model.Email</span>
+</div>
+<div>
+    <label>Address:</label>
+    <span>@Model.Address</span>
+</div>
+
+<a href="@Url.Action("Index", "Profile")">Back to List</a>

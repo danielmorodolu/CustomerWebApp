@@ -1,67 +1,110 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 using ProfileService.Models;
+using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+
+
+
 
 namespace ProfileService.Controllers
-{
-    [ApiController]
-    [Route("api/profile")]
-    public class ProfileController : ControllerBase
-    {
-        private readonly ApplicationDbContext _context;
 
-        public ProfileController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        [HttpGet("{id}")]
-public async Task<IActionResult> GetProfile(int id)
 {
-    var profile = await _context.Profiles.FindAsync(id);
-    if (profile == null)
+[Authorize]
+public class ProfileController : Controller
+{
+    private readonly ApplicationDbContext _context;
+
+    public ProfileController(ApplicationDbContext context)
     {
-        return NotFound();
+        _context = context;
     }
-    return Ok(profile);
-}
 
+    // GET: /Profile
+    public async Task<IActionResult> Index()
+    {
+        var profiles = await _context.Profiles.ToListAsync();
+        return View(profiles);
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateProfile(Profile profile)
+    // GET: /Profile/Create
+    public IActionResult Create()
+    {
+        return View();
+    }
+
+    // POST: /Profile/Create
+    [HttpPost]
+    public async Task<IActionResult> Create(Profile profile)
+    {
+        if (ModelState.IsValid)
         {
-            _context.Profiles.Add(profile);
+            _context.Add(profile);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetProfile), new { id = profile.Id }, profile);
+            return RedirectToAction(nameof(Index));
         }
+        return View(profile);
+    }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProfile(int id, Profile profile)
+    // GET: /Profile/Edit/5
+    public async Task<IActionResult> Edit(int id)
+    {
+        var profile = await _context.Profiles.FindAsync(id);
+        if (profile == null) return NotFound();
+        return View(profile);
+    }
+
+    // POST: /Profile/Edit/5
+    [HttpPost]
+    public async Task<IActionResult> Edit(int id, Profile profile)
+    {
+        if (id != profile.Id) return BadRequest();
+        if (ModelState.IsValid)
         {
-            if (id != profile.Id)
+            try
             {
-                return BadRequest();
+                _context.Update(profile);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
-
-            _context.Entry(profile).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Profiles.Any(e => e.Id == id))
+                    return NotFound();
+                throw;
+            }
         }
+        return View(profile);
+    }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProfile(int id)
+    // GET: /Profile/Delete/5
+    public async Task<IActionResult> Delete(int id)
+    {
+        var profile = await _context.Profiles.FindAsync(id);
+        if (profile == null) return NotFound();
+        return View(profile);
+    }
+
+    // POST: /Profile/DeleteConfirmed
+    [HttpPost, ActionName("Delete")]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var profile = await _context.Profiles.FindAsync(id);
+        if (profile != null)
         {
-            var profile = await _context.Profiles.FindAsync(id);
-            if (profile == null)
-            {
-                return NotFound();
-            }
-
             _context.Profiles.Remove(profile);
             await _context.SaveChangesAsync();
-
-            return NoContent();
         }
+        return RedirectToAction(nameof(Index));
     }
+
+    // GET: /Profile/Details/5
+    public async Task<IActionResult> Details(int id)
+    {
+        var profile = await _context.Profiles.FindAsync(id);
+        if (profile == null) return NotFound();
+        return View(profile);
+    }
+}
 }
